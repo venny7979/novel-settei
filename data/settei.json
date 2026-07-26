@@ -195,8 +195,8 @@
     {
       "id": 2,
       "name": "백호",
-      "aliases": null,
-      "age": null,
+      "aliases": "",
+      "age": "미상",
       "status": "생존",
       "faction_id": 4,
       "position": "백호령\n과거 호랑이 일족의 왕",
@@ -205,7 +205,7 @@
       "personality": "무뚝뚝하고 츤데레. 정국을 자주 갈구지만, 위험할 때는 반드시 도와준다.",
       "skills": "[{\"name\":\"발톱을 이용한 참격\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"},{\"name\":\"귀령 지배\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"},{\"name\":\"(봉인) 전성기 능력 다수\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"}]",
       "created_at": "2026-07-26 09:46:46",
-      "updated_at": "2026-07-26 09:46:46"
+      "updated_at": "2026-07-26 14:04:31"
     },
     {
       "id": 1,
