@@ -1,15 +1,24 @@
 import { fetchFile, saveFile } from './github';
 import { getToken } from './auth';
 
-async function load() {
+// 매 저장 전에 매번 GitHub에서 새로 읽어오면 왕복이 늘어나 느려지므로,
+// 마지막으로 알고 있는 파일 상태(sha 포함)를 캐싱해두고 재사용한다.
+// 캐시가 낡아서 충돌(409)이 나면 EntityManager의 재시도 로직이 강제로
+// 다시 읽어오도록(forceRefresh) 만든다.
+let cache = null;
+
+async function load(forceRefresh = false) {
+  if (cache && !forceRefresh) return cache;
   const token = getToken();
   if (!token) throw new Error('로그인이 필요합니다.');
-  return fetchFile(token);
+  cache = await fetchFile(token);
+  return cache;
 }
 
 async function save(data, sha, message) {
   const token = getToken();
-  return saveFile(token, data, sha, message);
+  const newSha = await saveFile(token, data, sha, message);
+  cache = { data, sha: newSha };
 }
 
 function nowStamp() {
@@ -44,8 +53,8 @@ function labelOf(item) {
   return item.name ?? item.title ?? `#${item.id}`;
 }
 
-export async function listItems(resource) {
-  const { data } = await load();
+export async function listItems(resource, forceRefresh = false) {
+  const { data } = await load(forceRefresh);
   const table = tableFor(resource);
   return [...data[table]].sort((a, b) => b.id - a.id);
 }
@@ -56,8 +65,8 @@ export async function getItem(resource, id) {
   return data[table].find((item) => String(item.id) === String(id));
 }
 
-export async function createItem(resource, payload) {
-  const { data, sha } = await load();
+export async function createItem(resource, payload, forceRefresh = false) {
+  const { data, sha } = await load(forceRefresh);
   const table = tableFor(resource);
   const stamp = nowStamp();
   const item = { id: nextId(data[table]), ...payload, created_at: stamp, updated_at: stamp };
@@ -66,8 +75,8 @@ export async function createItem(resource, payload) {
   return item;
 }
 
-export async function updateItem(resource, id, payload) {
-  const { data, sha } = await load();
+export async function updateItem(resource, id, payload, forceRefresh = false) {
+  const { data, sha } = await load(forceRefresh);
   const table = tableFor(resource);
   const index = data[table].findIndex((item) => String(item.id) === String(id));
   if (index === -1) return null;
@@ -77,8 +86,8 @@ export async function updateItem(resource, id, payload) {
   return updated;
 }
 
-export async function deleteItem(resource, id) {
-  const { data, sha } = await load();
+export async function deleteItem(resource, id, forceRefresh = false) {
+  const { data, sha } = await load(forceRefresh);
   const table = tableFor(resource);
   const target = data[table].find((item) => String(item.id) === String(id));
   data[table] = data[table].filter((item) => String(item.id) !== String(id));

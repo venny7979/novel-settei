@@ -84,7 +84,8 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   async function withConflictRetry(action, attempts = 4) {
     for (let i = 0; i < attempts; i++) {
       try {
-        await action();
+        // 첫 시도는 캐시된 sha를 그대로 쓰고(빠름), 충돌 시에만 강제로 새로 읽어온다.
+        await action(i > 0);
         return;
       } catch (err) {
         const message = err.message ?? String(err);
@@ -155,16 +156,17 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
       });
     setSaving(true);
     try {
-      await withConflictRetry(async () => {
+      await withConflictRetry(async (forceRefresh) => {
         if (selectedId) {
-          await updateItem(resource, selectedId, payload);
+          const updated = await updateItem(resource, selectedId, payload, forceRefresh);
+          setItems((prev) => prev.map((it) => (it.id === updated.id ? updated : it)));
         } else {
-          const created = await createItem(resource, payload);
+          const created = await createItem(resource, payload, forceRefresh);
           setSelectedId(created.id);
+          setItems((prev) => [created, ...prev]);
         }
       });
       setError(null);
-      await refresh();
     } catch (err) {
       setError(err.message ?? String(err));
     } finally {
@@ -177,10 +179,10 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
     if (!confirm('정말 삭제할까요?')) return;
     setSaving(true);
     try {
-      await withConflictRetry(() => deleteItem(resource, selectedId));
+      await withConflictRetry((forceRefresh) => deleteItem(resource, selectedId, forceRefresh));
+      setItems((prev) => prev.filter((it) => it.id !== selectedId));
       setError(null);
       startNew();
-      await refresh();
     } catch (err) {
       setError(err.message ?? String(err));
     } finally {
