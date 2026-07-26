@@ -61,7 +61,7 @@
       "id": 11,
       "name": "VIP 경호원 (구분: 장산범)",
       "aliases": "이름 미공개",
-      "age": "",
+      "age": "미상",
       "status": "생존",
       "faction_id": 3,
       "position": "백산시큐리티 경호팀",
@@ -70,7 +70,7 @@
       "personality": "말이 매우 적다. 시끄러운 곳을 싫어한다. 술을 매우 좋아한다.",
       "skills": "[{\"name\":\"환각 유도\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"},{\"name\":\"존재감 은폐\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"},{\"name\":\"(정체 공개 후 추가)\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"}]",
       "created_at": "2026-07-26 09:46:46",
-      "updated_at": "2026-07-26 14:12:33"
+      "updated_at": "2026-07-26 14:17:41"
     },
     {
       "id": 10,
