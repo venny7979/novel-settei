@@ -77,10 +77,20 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(emptyForm(fields));
   const [relationOptions, setRelationOptions] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   async function refresh() {
-    const data = await listItems(resource);
-    setItems(data);
+    setLoading(true);
+    try {
+      const data = await listItems(resource);
+      setItems(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message ?? String(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -127,21 +137,31 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
       .forEach((f) => {
         payload[f.name] = JSON.stringify(form[f.name] ?? []);
       });
-    if (selectedId) {
-      await updateItem(resource, selectedId, payload);
-    } else {
-      const created = await createItem(resource, payload);
-      setSelectedId(created.id);
+    try {
+      if (selectedId) {
+        await updateItem(resource, selectedId, payload);
+      } else {
+        const created = await createItem(resource, payload);
+        setSelectedId(created.id);
+      }
+      setError(null);
+      await refresh();
+    } catch (err) {
+      setError(err.message ?? String(err));
     }
-    await refresh();
   }
 
   async function handleDelete() {
     if (!selectedId) return;
     if (!confirm('정말 삭제할까요?')) return;
-    await deleteItem(resource, selectedId);
-    startNew();
-    await refresh();
+    try {
+      await deleteItem(resource, selectedId);
+      setError(null);
+      startNew();
+      await refresh();
+    } catch (err) {
+      setError(err.message ?? String(err));
+    }
   }
 
   return (
@@ -151,6 +171,8 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
           <h2>{title}</h2>
           <button onClick={startNew}>+ 새로 만들기</button>
         </div>
+        {error && <div className="error-banner">⚠️ {error}</div>}
+        {loading && <div className="loading-banner">불러오는 중...</div>}
         <ul>
           {items.map((item) => (
             <li
@@ -161,7 +183,9 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
               {listLabel(item)}
             </li>
           ))}
-          {items.length === 0 && <li className="empty">아직 항목이 없습니다.</li>}
+          {!loading && !error && items.length === 0 && (
+            <li className="empty">아직 항목이 없습니다.</li>
+          )}
         </ul>
       </div>
 

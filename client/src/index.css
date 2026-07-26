@@ -161,6 +161,21 @@ body {
   cursor: default;
 }
 
+.error-banner {
+  background: #fdecea;
+  color: #a01a0f;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f5c6c0;
+  white-space: pre-wrap;
+}
+
+.loading-banner {
+  color: #888;
+  font-size: 13px;
+  padding: 10px 16px;
+}
+
 .entity-form {
   flex: 1;
   background: #fff;
