@@ -1,0 +1,189 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: #f7f7f8;
+  color: #1a1a1a;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.app-nav {
+  width: 180px;
+  flex-shrink: 0;
+  background: #202225;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+}
+
+.app-title {
+  font-weight: 700;
+  font-size: 18px;
+  padding: 0 20px 16px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 8px;
+}
+
+.app-nav a {
+  color: #ccc;
+  text-decoration: none;
+  padding: 10px 20px;
+}
+
+.app-nav a.active {
+  background: #33363b;
+  color: #fff;
+  font-weight: 600;
+}
+
+.app-main {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}
+
+.entity-manager {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+}
+
+.entity-list {
+  width: 280px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+.entity-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.entity-list-header h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.entity-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entity-list li {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f2f2f2;
+  font-size: 14px;
+}
+
+.entity-list li:hover {
+  background: #f4f4f5;
+}
+
+.entity-list li.active {
+  background: #e8edff;
+  font-weight: 600;
+}
+
+.entity-list li.empty {
+  color: #999;
+  cursor: default;
+}
+
+.entity-form {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 20px;
+  overflow: auto;
+}
+
+.field {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  background: #3d5afe;
+  color: #fff;
+}
+
+button.danger {
+  background: #d93025;
+}
+
+.repeater {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.repeater-row {
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.repeater-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.repeater-row-header button {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.repeater .field {
+  margin-bottom: 8px;
+}
