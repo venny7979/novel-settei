@@ -44,6 +44,16 @@ body {
   font-weight: 600;
 }
 
+.app-nav-spacer {
+  flex: 1;
+}
+
+.app-nav button {
+  margin: 4px 12px;
+  background: #33363b;
+  font-size: 13px;
+}
+
 .app-main {
   flex: 1;
   overflow: auto;

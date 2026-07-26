@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listItems, createItem, updateItem, deleteItem } from './api';
+import { listItems, createItem, updateItem, deleteItem } from './storage';
 
 function emptyForm(fields) {
   const form = {};
