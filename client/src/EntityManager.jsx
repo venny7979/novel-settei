@@ -79,6 +79,20 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   const [relationOptions, setRelationOptions] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  async function withConflictRetry(action) {
+    try {
+      await action();
+    } catch (err) {
+      const message = err.message ?? String(err);
+      if (message.includes('409')) {
+        await action();
+      } else {
+        throw err;
+      }
+    }
+  }
 
   async function refresh() {
     setLoading(true);
@@ -131,36 +145,45 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (saving) return;
     const payload = { ...form };
     fields
       .filter((f) => f.type === 'repeater')
       .forEach((f) => {
         payload[f.name] = JSON.stringify(form[f.name] ?? []);
       });
+    setSaving(true);
     try {
-      if (selectedId) {
-        await updateItem(resource, selectedId, payload);
-      } else {
-        const created = await createItem(resource, payload);
-        setSelectedId(created.id);
-      }
+      await withConflictRetry(async () => {
+        if (selectedId) {
+          await updateItem(resource, selectedId, payload);
+        } else {
+          const created = await createItem(resource, payload);
+          setSelectedId(created.id);
+        }
+      });
       setError(null);
       await refresh();
     } catch (err) {
       setError(err.message ?? String(err));
+    } finally {
+      setSaving(false);
     }
   }
 
   async function handleDelete() {
-    if (!selectedId) return;
+    if (!selectedId || saving) return;
     if (!confirm('정말 삭제할까요?')) return;
+    setSaving(true);
     try {
-      await deleteItem(resource, selectedId);
+      await withConflictRetry(() => deleteItem(resource, selectedId));
       setError(null);
       startNew();
       await refresh();
     } catch (err) {
       setError(err.message ?? String(err));
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -238,9 +261,11 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
           </div>
         ))}
         <div className="form-actions">
-          <button type="submit">{selectedId ? '수정 저장' : '생성'}</button>
+          <button type="submit" disabled={saving}>
+            {saving ? '저장 중...' : selectedId ? '수정 저장' : '생성'}
+          </button>
           {selectedId && (
-            <button type="button" className="danger" onClick={handleDelete}>
+            <button type="button" className="danger" onClick={handleDelete} disabled={saving}>
               삭제
             </button>
           )}
