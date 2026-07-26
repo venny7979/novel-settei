@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:4000/api';
+const BASE = import.meta.env.DEV ? 'http://localhost:4000/api' : '/api';
 
 export async function listItems(resource) {
   const res = await fetch(`${BASE}/${resource}`);
