@@ -81,15 +81,16 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  async function withConflictRetry(action) {
-    try {
-      await action();
-    } catch (err) {
-      const message = err.message ?? String(err);
-      if (message.includes('409')) {
+  async function withConflictRetry(action, attempts = 4) {
+    for (let i = 0; i < attempts; i++) {
+      try {
         await action();
-      } else {
-        throw err;
+        return;
+      } catch (err) {
+        const message = err.message ?? String(err);
+        const isLastAttempt = i === attempts - 1;
+        if (!message.includes('409') || isLastAttempt) throw err;
+        await new Promise((resolve) => setTimeout(resolve, 300 * (i + 1)));
       }
     }
   }
