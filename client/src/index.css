@@ -233,8 +233,15 @@ body {
 
 .form-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 16px;
+}
+
+.saved-message {
+  color: #1a7f37;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 button {

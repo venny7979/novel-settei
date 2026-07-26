@@ -80,6 +80,7 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savedMessage, setSavedMessage] = useState(null);
 
   async function withConflictRetry(action, attempts = 4) {
     for (let i = 0; i < attempts; i++) {
@@ -121,6 +122,7 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
 
   function selectItem(item) {
     setSelectedId(item.id);
+    setSavedMessage(null);
     const nextForm = emptyForm(fields);
     fields.forEach((f) => {
       if (f.type === 'repeater') {
@@ -139,10 +141,17 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
   function startNew() {
     setSelectedId(null);
     setForm(emptyForm(fields));
+    setSavedMessage(null);
   }
 
   function handleChange(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
+    setSavedMessage(null);
+  }
+
+  function flashSaved(message) {
+    setSavedMessage(message);
+    setTimeout(() => setSavedMessage((current) => (current === message ? null : current)), 4000);
   }
 
   async function handleSubmit(e) {
@@ -155,6 +164,7 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
         payload[f.name] = JSON.stringify(form[f.name] ?? []);
       });
     setSaving(true);
+    setSavedMessage(null);
     try {
       await withConflictRetry(async (forceRefresh) => {
         if (selectedId) {
@@ -167,6 +177,7 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
         }
       });
       setError(null);
+      flashSaved(`✓ 저장 완료 (${new Date().toLocaleTimeString('ko-KR')})`);
     } catch (err) {
       setError(err.message ?? String(err));
     } finally {
@@ -178,11 +189,13 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
     if (!selectedId || saving) return;
     if (!confirm('정말 삭제할까요?')) return;
     setSaving(true);
+    setSavedMessage(null);
     try {
       await withConflictRetry((forceRefresh) => deleteItem(resource, selectedId, forceRefresh));
       setItems((prev) => prev.filter((it) => it.id !== selectedId));
       setError(null);
       startNew();
+      flashSaved(`✓ 삭제 완료 (${new Date().toLocaleTimeString('ko-KR')})`);
     } catch (err) {
       setError(err.message ?? String(err));
     } finally {
@@ -272,6 +285,7 @@ export default function EntityManager({ resource, title, fields, listLabel }) {
               삭제
             </button>
           )}
+          {savedMessage && <span className="saved-message">{savedMessage}</span>}
         </div>
       </form>
     </div>
