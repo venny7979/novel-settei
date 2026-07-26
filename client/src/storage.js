@@ -1,16 +1,15 @@
-const API = '/api/data';
+import { fetchFile, saveFile } from './github';
+import { getToken } from './auth';
 
 async function load() {
-  const res = await fetch(API);
-  return res.json();
+  const token = getToken();
+  if (!token) throw new Error('로그인이 필요합니다.');
+  return fetchFile(token);
 }
 
-async function save(store) {
-  await fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(store, null, 2),
-  });
+async function save(data, sha, message) {
+  const token = getToken();
+  return saveFile(token, data, sha, message);
 }
 
 function nowStamp() {
@@ -28,58 +27,71 @@ const RESOURCE_TABLES = {
   factions: 'factions',
 };
 
+const RESOURCE_LABELS = {
+  characters: '캐릭터',
+  'world-entries': '세계관',
+  episodes: '연재 기록',
+  factions: '세력',
+};
+
 function tableFor(resource) {
   const key = RESOURCE_TABLES[resource];
   if (!key) throw new Error(`Unknown resource: ${resource}`);
   return key;
 }
 
+function labelOf(item) {
+  return item.name ?? item.title ?? `#${item.id}`;
+}
+
 export async function listItems(resource) {
-  const store = await load();
+  const { data } = await load();
   const table = tableFor(resource);
-  return [...store[table]].sort((a, b) => b.id - a.id);
+  return [...data[table]].sort((a, b) => b.id - a.id);
 }
 
 export async function getItem(resource, id) {
-  const store = await load();
+  const { data } = await load();
   const table = tableFor(resource);
-  return store[table].find((item) => String(item.id) === String(id));
+  return data[table].find((item) => String(item.id) === String(id));
 }
 
-export async function createItem(resource, data) {
-  const store = await load();
+export async function createItem(resource, payload) {
+  const { data, sha } = await load();
   const table = tableFor(resource);
   const stamp = nowStamp();
-  const item = { id: nextId(store[table]), ...data, created_at: stamp, updated_at: stamp };
-  store[table].push(item);
-  await save(store);
+  const item = { id: nextId(data[table]), ...payload, created_at: stamp, updated_at: stamp };
+  data[table].push(item);
+  await save(data, sha, `${RESOURCE_LABELS[resource]} 추가: ${labelOf(item)}`);
   return item;
 }
 
-export async function updateItem(resource, id, data) {
-  const store = await load();
+export async function updateItem(resource, id, payload) {
+  const { data, sha } = await load();
   const table = tableFor(resource);
-  const index = store[table].findIndex((item) => String(item.id) === String(id));
+  const index = data[table].findIndex((item) => String(item.id) === String(id));
   if (index === -1) return null;
-  const updated = { ...store[table][index], ...data, updated_at: nowStamp() };
-  store[table][index] = updated;
-  await save(store);
+  const updated = { ...data[table][index], ...payload, updated_at: nowStamp() };
+  data[table][index] = updated;
+  await save(data, sha, `${RESOURCE_LABELS[resource]} 수정: ${labelOf(updated)}`);
   return updated;
 }
 
 export async function deleteItem(resource, id) {
-  const store = await load();
+  const { data, sha } = await load();
   const table = tableFor(resource);
-  store[table] = store[table].filter((item) => String(item.id) !== String(id));
-  await save(store);
+  const target = data[table].find((item) => String(item.id) === String(id));
+  data[table] = data[table].filter((item) => String(item.id) !== String(id));
+  await save(data, sha, `${RESOURCE_LABELS[resource]} 삭제: ${target ? labelOf(target) : id}`);
 }
 
 export async function exportData() {
-  const store = await load();
-  return JSON.stringify(store, null, 2);
+  const { data } = await load();
+  return JSON.stringify(data, null, 2);
 }
 
 export async function importData(jsonString) {
+  const { sha } = await load();
   const parsed = JSON.parse(jsonString);
-  await save(parsed);
+  await save(parsed, sha, 'JSON 가져오기로 전체 데이터 교체');
 }

@@ -1,13 +1,32 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { NavLink, Route, Routes, Navigate } from 'react-router-dom';
 import CharactersPage from './pages/CharactersPage';
 import WorldPage from './pages/WorldPage';
 import EpisodesPage from './pages/EpisodesPage';
 import FactionsPage from './pages/FactionsPage';
 import { exportData, importData } from './storage';
+import { getToken, setToken, clearToken } from './auth';
+import Login from './Login';
 
 export default function App() {
+  const [token, setTokenState] = useState(getToken());
   const fileInputRef = useRef(null);
+
+  if (!token) {
+    return (
+      <Login
+        onLogin={(t) => {
+          setToken(t);
+          setTokenState(t);
+        }}
+      />
+    );
+  }
+
+  function handleLogout() {
+    clearToken();
+    setTokenState(null);
+  }
 
   async function handleExport() {
     const json = await exportData();
@@ -51,6 +70,9 @@ export default function App() {
         </button>
         <button type="button" onClick={handleImportClick}>
           JSON 가져오기
+        </button>
+        <button type="button" onClick={handleLogout}>
+          로그아웃
         </button>
         <input
           ref={fileInputRef}

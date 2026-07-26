@@ -14,6 +14,52 @@ body {
   height: 100vh;
 }
 
+.login-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #202225;
+}
+
+.login-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px;
+  width: 420px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-box h1 {
+  margin: 0 0 4px;
+}
+
+.login-box p {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+}
+
+.login-hint {
+  color: #888 !important;
+  font-size: 12px !important;
+}
+
+.login-box input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.login-box button {
+  margin-top: 8px;
+}
+
 .app-nav {
   width: 180px;
   flex-shrink: 0;
