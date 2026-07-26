@@ -9,8 +9,8 @@ import { exportData, importData } from './storage';
 export default function App() {
   const fileInputRef = useRef(null);
 
-  function handleExport() {
-    const json = exportData();
+  async function handleExport() {
+    const json = await exportData();
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -28,9 +28,9 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       if (!confirm('현재 데이터를 불러온 JSON으로 덮어씁니다. 계속할까요?')) return;
-      importData(reader.result);
+      await importData(reader.result);
       window.location.reload();
     };
     reader.readAsText(file);

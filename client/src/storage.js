@@ -1,49 +1,20 @@
-const STORAGE_KEY = 'novel-settei-data';
+const API = '/api/data';
 
-const SEED_DATA = {
-  factions: [
-    { id: 4, name: '호랑이 일족', leader: '백호', territory: null, goal: null, description: '과거 호랑이 요괴 일족의 세력. 백호가 왕이었으나 현재는 대부분 소실되었고, 백호만 남은 것으로 보인다.', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 3, name: '백산시큐리티', leader: '백산시큐리티 대표 (이름 미공개)', territory: null, goal: '백호를 찾는 것', description: '백호의 옛 부하가 인간 사회에 설립한 경호 회사. 표면적으로는 경호 업체지만 실제로는 백호를 추적하는 것이 목적.', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 2, name: '귀왕 세력', leader: '귀왕 (미상)', territory: '강남 클럽 등 인간 사회 침투 거점', goal: '인간 정기 흡수 및 세력 확장', description: '귀왕을 정점으로 하는 세력. 구미호가 간부로서 강남 클럽을 거점으로 운영하며, 매구들이 행동원으로 활동한다.', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 1, name: '727 착호갑사', leader: '박준혁 대위 (분대장)', territory: null, goal: '귀신/요괴 관련 사건 대응 및 소탕', description: '국가 소속의 대응 부대. 분대 번호 727.', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-  ],
-  characters: [
-    { id: 12, name: '김민희', aliases: null, age: null, status: '생존', faction_id: 1, position: '727 착호갑사\n소위', specialty: '치유\n응급처치\n민간인 구조\n후방 지원', characteristic: '분대 내 의무관 역할에 가깝다. (참고: 정국의 귀안 봉인이 깨지기 시작한 계기가 민희의 회복술이었을 가능성도 있음.)', personality: '침착하다. 따뜻하다. 민간인을 먼저 생각한다. 응급 상황에서도 차분하다.', skills: '[{"name":"회복술(가칭)","incantation":"","trait":"","constraint":""},{"name":"봉인 안정화","incantation":"","trait":"","constraint":""},{"name":"영력 치료","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 11, name: 'VIP 경호원', aliases: '이름 미공개', age: null, status: '생존', faction_id: 3, position: '백산시큐리티 경호팀', specialty: 'VIP 경호\n환각\n근접전', characteristic: '모델 같은 외모의 기생오라비 같은 미남. 항상 이어폰을 착용. 첫 등장에서는 이름과 정체가 공개되지 않는다.', personality: '말이 매우 적다. 시끄러운 곳을 싫어한다. 술을 매우 좋아한다.', skills: '[{"name":"환각 유도","incantation":"","trait":"","constraint":""},{"name":"존재감 은폐","incantation":"","trait":"","constraint":""},{"name":"(정체 공개 후 추가)","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 10, name: '백산시큐리티 대표', aliases: '이름 미공개', age: null, status: '생존', faction_id: 3, position: '백산시큐리티 대표', specialty: '조직 운영\n정보 수집', characteristic: '백호의 옛 부하로, 인간 사회에 백산시큐리티를 설립하고 백호를 찾고 있음.', personality: '신중한 성격.', skills: '[{"name":"미공개","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 9, name: '두억시니', aliases: null, age: null, status: '생존', faction_id: 2, position: '귀왕 세력 행동대장', specialty: '근접전\n역병', characteristic: '백호에게 패배한 후 생존한 상태.', personality: '전투광. 힘을 신뢰한다.', skills: '[{"name":"역기만연","incantation":"","trait":"","constraint":""},{"name":"역기폭신","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 8, name: '매구', aliases: '다수 (복수 존재)', age: null, status: '생존', faction_id: 2, position: '귀왕 세력 행동원', specialty: '유혹\n인간 사회 위장', characteristic: '남녀 혼재. 클럽 직원 또는 손님으로 위장. 평소에는 소량의 정기만 흡수하나, 최근 구미호의 명령으로 과도한 정기 흡수를 시작.', personality: null, skills: '[{"name":"둔갑","incantation":"","trait":"","constraint":""},{"name":"정기 흡수","incantation":"","trait":"","constraint":""},{"name":"매혹","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 7, name: '구미호', aliases: '본명 미공개', age: null, status: '생존', faction_id: 2, position: '귀왕 세력 간부\n강남 클럽 사장', specialty: '인간 사회 침투\n조직 운영\n유혹', characteristic: '귀왕에게 정기를 상납한다.', personality: '냉정한 관리자. 매우 지능적이다. 감정보다 효율을 우선한다.', skills: '[{"name":"둔갑","incantation":"","trait":"","constraint":""},{"name":"정기 흡수","incantation":"","trait":"","constraint":""},{"name":"환술","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 6, name: '오세찬', aliases: null, age: null, status: '생존', faction_id: 1, position: '727 착호갑사\n소위', specialty: '탐지\n분석', characteristic: '보고 체계가 몸에 배어 있다.', personality: '과묵하다. 분석적이다.', skills: '[{"name":"현마진","incantation":"","trait":"","constraint":""},{"name":"귀기 탐색","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 5, name: '한도윤', aliases: null, age: null, status: '생존', faction_id: 1, position: '727 착호갑사\n중위\n의무관', specialty: '회복\n지원', characteristic: '팀의 브레인 역할.', personality: '침착하다. 현실적이다. 다정한 성격.', skills: '[{"name":"회복술","incantation":"","trait":"","constraint":""},{"name":"권총 사격","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 4, name: '이수아', aliases: '수아', age: null, status: '생존', faction_id: 1, position: '727 착호갑사\n소위', specialty: '근접전\n기동전', characteristic: null, personality: '밝고 활발하다. 장난기가 있다. 후배를 잘 챙긴다. 전투에서는 냉정하다.', skills: '[{"name":"백호보","incantation":"","trait":"","constraint":""},{"name":"청룡섬","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 3, name: '박준혁', aliases: null, age: null, status: '생존', faction_id: 1, position: '727 착호갑사\n대위\n분대장', specialty: '검술\n전술 지휘', characteristic: null, personality: '냉정한 군인. 원칙주의. 부하를 강하게 키우는 타입. 판단이 빠르다.', skills: '[{"name":"현무쇄","incantation":"","trait":"","constraint":""},{"name":"현무참","incantation":"","trait":"","constraint":""},{"name":"현무붕격","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 2, name: '백호', aliases: null, age: null, status: '생존', faction_id: 4, position: '백호령\n과거 호랑이 일족의 왕', specialty: '근접전\n압도적인 신체능력\n귀령 지휘', characteristic: '과거 호랑이 일족의 왕이었으나 현재 대부분의 힘을 잃은 상태.', personality: '무뚝뚝하고 츤데레. 정국을 자주 갈구지만, 위험할 때는 반드시 도와준다.', skills: '[{"name":"발톱을 이용한 참격","incantation":"","trait":"","constraint":""},{"name":"귀령 지배","incantation":"","trait":"","constraint":""},{"name":"(봉인) 전성기 능력 다수","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-    { id: 1, name: '정국', aliases: '鄭國', age: '20대 후반', status: '생존', faction_id: 1, position: '727 착호갑사\n신입 갑사', specialty: '귀안\n귀령 계약\n귀령 소환', characteristic: '20대 후반 취업준비생 출신. 평범한 삶을 원함. 백호와 계약 후 점차 성장. 잠재력이 매우 큰 성장형 계약자.', personality: '소심하고 회피형 성격.', skills: '[{"name":"창귀 소환","incantation":"","trait":"","constraint":""},{"name":"(미개방) 귀령 지휘","incantation":"","trait":"","constraint":""},{"name":"(미개방) 귀문 개방","incantation":"","trait":"","constraint":""}]', created_at: '2026-07-26 09:46:46', updated_at: '2026-07-26 09:46:46' },
-  ],
-  world_entries: [],
-  episodes: [],
-};
+async function load() {
+  const res = await fetch(API);
+  return res.json();
+}
+
+async function save(store) {
+  await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(store, null, 2),
+  });
+}
 
 function nowStamp() {
   return new Date().toISOString().replace('T', ' ').slice(0, 19);
-}
-
-function load() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATA));
-    return structuredClone(SEED_DATA);
-  }
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return structuredClone(SEED_DATA);
-  }
-}
-
-function save(store) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
 function nextId(list) {
@@ -64,50 +35,51 @@ function tableFor(resource) {
 }
 
 export async function listItems(resource) {
-  const store = load();
+  const store = await load();
   const table = tableFor(resource);
   return [...store[table]].sort((a, b) => b.id - a.id);
 }
 
 export async function getItem(resource, id) {
-  const store = load();
+  const store = await load();
   const table = tableFor(resource);
   return store[table].find((item) => String(item.id) === String(id));
 }
 
 export async function createItem(resource, data) {
-  const store = load();
+  const store = await load();
   const table = tableFor(resource);
   const stamp = nowStamp();
   const item = { id: nextId(store[table]), ...data, created_at: stamp, updated_at: stamp };
   store[table].push(item);
-  save(store);
+  await save(store);
   return item;
 }
 
 export async function updateItem(resource, id, data) {
-  const store = load();
+  const store = await load();
   const table = tableFor(resource);
   const index = store[table].findIndex((item) => String(item.id) === String(id));
   if (index === -1) return null;
   const updated = { ...store[table][index], ...data, updated_at: nowStamp() };
   store[table][index] = updated;
-  save(store);
+  await save(store);
   return updated;
 }
 
 export async function deleteItem(resource, id) {
-  const store = load();
+  const store = await load();
   const table = tableFor(resource);
   store[table] = store[table].filter((item) => String(item.id) !== String(id));
-  save(store);
+  await save(store);
 }
 
-export function exportData() {
-  return JSON.stringify(load(), null, 2);
+export async function exportData() {
+  const store = await load();
+  return JSON.stringify(store, null, 2);
 }
 
-export function importData(jsonString) {
+export async function importData(jsonString) {
   const parsed = JSON.parse(jsonString);
-  save(parsed);
+  await save(parsed);
 }
