@@ -76,7 +76,7 @@
       "id": 10,
       "name": "백산시큐리티 대표",
       "aliases": "이름 미공개",
-      "age": null,
+      "age": "미상",
       "status": "생존",
       "faction_id": 3,
       "position": "백산시큐리티 대표",
@@ -85,7 +85,7 @@
       "personality": "신중한 성격.",
       "skills": "[{\"name\":\"미공개\",\"incantation\":\"\",\"trait\":\"\",\"constraint\":\"\"}]",
       "created_at": "2026-07-26 09:46:46",
-      "updated_at": "2026-07-26 09:46:46"
+      "updated_at": "2026-07-26 14:08:51"
     },
     {
       "id": 9,
