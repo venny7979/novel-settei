@@ -8,7 +8,9 @@ export default function Login({ onLogin }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const cleaned = token.replace(/\s+/g, '');
+    // GitHub PAT는 인쇄 가능한 ASCII 문자만 포함하므로, 복사 과정에서 섞여 들어온
+    // 한글/공백 등 다른 문자는 전부 제거한다 (안 그러면 헤더 생성 시 브라우저가 에러를 던짐).
+    const cleaned = token.replace(/[^\x21-\x7e]/g, '');
     if (!cleaned) return;
     setChecking(true);
     setError(null);
