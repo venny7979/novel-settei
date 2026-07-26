@@ -6,6 +6,7 @@ import EpisodesPage from './pages/EpisodesPage';
 import FactionsPage from './pages/FactionsPage';
 import { exportData, importData } from './storage';
 import { getToken, setToken, clearToken } from './auth';
+import { fetchFile } from './github';
 import Login from './Login';
 
 export default function App() {
@@ -15,7 +16,8 @@ export default function App() {
   if (!token) {
     return (
       <Login
-        onLogin={(t) => {
+        onLogin={async (t) => {
+          await fetchFile(t);
           setToken(t);
           setTokenState(t);
         }}

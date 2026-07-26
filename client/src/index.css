@@ -60,6 +60,29 @@ body {
   margin-top: 8px;
 }
 
+.login-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.login-input-row input {
+  flex: 1;
+  margin-top: 0;
+}
+
+.login-toggle {
+  margin-top: 0;
+  background: #555;
+  white-space: nowrap;
+}
+
+.login-error {
+  color: #a01a0f;
+  font-size: 13px !important;
+  margin: 4px 0 0 !important;
+}
+
 .app-nav {
   width: 180px;
   flex-shrink: 0;
